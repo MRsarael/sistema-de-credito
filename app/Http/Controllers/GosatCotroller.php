@@ -21,7 +21,7 @@ class GosatCotroller extends Controller
     }
 
     /**
-     * Bank credit offer consultation
+     * Consulta das ofertas de crédito bancário
      *
      * @return \Illuminate\Http\JsonResponse
      */
@@ -33,6 +33,31 @@ class GosatCotroller extends Controller
         try {
             $idPerson = (int) Crypt::decryptString($idPerson);
             $response['response'] = $this->service->creditConsultation($idPerson)->toArray(false);
+        } catch (\Exception $e) {
+            $response['error'] = true;
+            $response['message'] = $e->getMessage();
+            $code = Util::getStatusCode($e->getCode());
+        }
+
+        return response()->json($response, $code);
+    }
+
+    /**
+     * Busca das ofertas disponíveis
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function offerConsult($idPerson = null)
+    {
+        dd($idPerson);
+        $response = ['response' => [], 'error' => false, 'message' => 'Success'];
+        $code = 200;
+
+        try {
+            if($idPerson !== null)
+                $idPerson = (int) Crypt::decryptString($idPerson);
+            
+            $response['response'] = $this->service->creditOfferConsult($idPerson)->toArray(false);
         } catch (\Exception $e) {
             $response['error'] = true;
             $response['message'] = $e->getMessage();

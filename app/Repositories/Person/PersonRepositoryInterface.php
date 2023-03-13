@@ -13,4 +13,5 @@ interface PersonRepositoryInterface extends BaseRepositoryInterface
     public function update(int $id, array $data): JsonResource;
     public function find(int $id): JsonResource;
     public function delete(int $id): bool;
+    public function credit($idPerson = null): Collection;
 }

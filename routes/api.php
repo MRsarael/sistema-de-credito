@@ -14,7 +14,8 @@ Route::group(['middleware' => []], function () {
     });
     
     Route::prefix('/credit')->group(function () {
-        Route::get('/offer/{id_person}', \App\Http\Controllers\GosatCotroller::class . '@creditOffer');
+        Route::get('/consult/{id_person}', \App\Http\Controllers\GosatCotroller::class . '@creditOffer');
+        Route::get('/consult/offer/{?id_person}', \App\Http\Controllers\GosatCotroller::class . '@offerConsult');
     });
 });
 
