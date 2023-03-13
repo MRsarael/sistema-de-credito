@@ -4,3 +4,6 @@
 
 Sistema de simulação de oferta de crédito consumindo a API de testes de *Gosat*
 
+## Link collection Postman
+
+<p>http://127.0.0.1:8000/api/credit/eyJpdiI6IjdYOTY0M1JJU20xVVJIRUxNRjZEV1E9PSIsInZhbHVlIjoiemhFa2xlSzdGaHljSWVhUEg5MTFBUT09IiwibWFjIjoiNDFlYjRkZWI1YWI1NTMzMmI3YTQ4MzU5MjVkZjM0ZGM1ZWI2ODcxYmE4ZWYzZWMzZThkYmRkZjk0ODQyYjY4NCIsInRhZyI6IiJ9</p>
