@@ -7,6 +7,7 @@ use App\Services\PersonaService;
 
 use App\FormRequests\PersonaStoreFormRequest;
 use App\FormRequests\PersonaUpdateFormRequest;
+use App\FormRequests\PersonSimulationFormRequest;
 
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Crypt;
@@ -134,6 +135,55 @@ class PersonaCotroller extends Controller
         try {
             $idPerson = (int) Crypt::decryptString($idPerson);
             $response['response'] = $this->service->deletePerson($idPerson);
+        } catch (\Exception $e) {
+            $response['error'] = true;
+            $response['message'] = $e->getMessage();
+            $code = Util::getStatusCode($e->getCode());
+        }
+
+        return response()->json($response, $code);
+    }
+
+    /**
+     * Busca das ofertas disponíveis
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function offerConsult($idPerson = null)
+    {
+        $response = ['response' => [], 'error' => false, 'message' => 'Success'];
+        $code = 200;
+
+        try {
+            if($idPerson !== null)
+                $idPerson = (int) Crypt::decryptString($idPerson);
+            
+            $response['response'] = $this->service->creditOfferConsult($idPerson)->toArray(false);
+        } catch (\Exception $e) {
+            $response['error'] = true;
+            $response['message'] = $e->getMessage();
+            $code = Util::getStatusCode($e->getCode());
+        }
+
+        return response()->json($response, $code);
+    }
+
+    public function simulationOffer()
+    {
+        $response = ['response' => [], 'error' => false, 'message' => 'Success'];
+        $code = 200;
+
+        try {
+            $validator = Validator::make($this->request->all(), (new PersonSimulationFormRequest)->rules());
+
+            if ($validator->fails()) {
+                throw new \Exception(Util::convertMessageErrorFormRequest($validator->errors()->messages()));
+            }
+            
+            $idPerson = (int) Crypt::decryptString($this->request->get('idPerson'));
+            $idInstitution = (int) Crypt::decryptString($this->request->get('idInstitution'));
+            $codModality = $this->request->get('codModality');
+            $response['response'] = $this->service->simulationOffer($idPerson, $idInstitution, $codModality)->toArray(false);
         } catch (\Exception $e) {
             $response['error'] = true;
             $response['message'] = $e->getMessage();

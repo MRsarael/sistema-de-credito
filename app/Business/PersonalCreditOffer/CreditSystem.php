@@ -9,7 +9,7 @@ use stdClass;
 
 class CreditSystem implements CreditSystemInterface
 {
-    private int $idPerson;
+    private int $idPerson = 0;
 
     public function __construct() {/**/}
     
@@ -113,7 +113,7 @@ class CreditSystem implements CreditSystemInterface
                         $financialInstitution = $dataCollection->where('financial_institution_id', $value->credit_offer_modality_id_financial_institution)->first();
 
                         if($financialInstitution !== null) {
-                            $creditOfferModalityObject->institutionId = Crypt::encryptString($financialInstitution->financial_institution_id);
+                            $creditOfferModalityObject->idInstitution = Crypt::encryptString($financialInstitution->financial_institution_id);
                             $creditOfferModalityObject->idGosat = $financialInstitution->financial_institution_id_gosat;
                             $creditOfferModalityObject->nameInstitution = $financialInstitution->financial_institution_name;
                         }

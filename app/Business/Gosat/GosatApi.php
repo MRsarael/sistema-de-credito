@@ -12,10 +12,10 @@ abstract class GosatApi
 
     abstract public function consult(): Collection;
 
-    protected function log(string $body, string $response, string $code, string $client): void
+    protected function log(string $body, string $response, string $code, string $client, string $method, string $url): void
     {
         $this->logApiRepository->new([
-            'body' => $body, 'response' => $response, 'code' => $code, 'client' => $client
+            'body' => $body, 'response' => $response, 'code' => $code, 'client' => $client, 'method' => $method, 'url' => $url
         ]);
     }
 }

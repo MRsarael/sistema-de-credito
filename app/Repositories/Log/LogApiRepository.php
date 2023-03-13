@@ -40,7 +40,9 @@ class LogApiRepository implements LogApiRepositoryInterface
             'body'     => $data['body'],
             'response' => $data['response'],
             'code'     => $data['code'],
-            'client'   => $data['client']
+            'client'   => $data['client'],
+            'method'   => $data['method'],
+            'url'      => $data['url']
         ]);
         
         return new JsonResource($this->formatModel($log));

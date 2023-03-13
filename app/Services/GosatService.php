@@ -31,11 +31,4 @@ class GosatService implements GosatServiceInterface
         
         return new JsonResource($result->all());
     }
-
-    public function creditOfferConsult(mixed $idPerson): JsonResource
-    {
-        $creditOffer = $this->personRepository->credit($idPerson);
-        dd($creditOffer);
-        return new JsonResource([]);
-    }
 }

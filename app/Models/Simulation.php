@@ -10,6 +10,6 @@ class Simulation extends Model
 {
     use HasFactory, SoftDeletes;
     protected $table = 'simulation';
-    protected $fillable = ['id_credit_offer_modality','min_installments','max_installments','min_value','max_value','month_interest'];
+    protected $fillable = ['id_personal_credit_offer', 'min_installments', 'max_installments', 'min_value', 'max_value', 'month_interest'];
     public $timestamps = true;
 }

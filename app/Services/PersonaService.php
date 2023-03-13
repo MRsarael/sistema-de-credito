@@ -2,6 +2,9 @@
 
 namespace App\Services;
 
+use App\Business\Gosat\GosatApiFactory;
+use App\Business\PersonalCreditOffer\PersonalCreditOfferFactory;
+use App\Repositories\PersonalCredit\PersonalCreditOfferRepositoryInterface;
 use App\Repositories\Person\PersonRepositoryInterface;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Crypt;
@@ -9,10 +12,12 @@ use Illuminate\Support\Facades\Crypt;
 class PersonaService implements PersonaServiceInterface
 {
     private PersonRepositoryInterface $personRepository;
+    private PersonalCreditOfferRepositoryInterface $personalCreditOfferRepository;
 
-    public function __construct(PersonRepositoryInterface $personRepository)
+    public function __construct(PersonRepositoryInterface $personRepository, PersonalCreditOfferRepositoryInterface $personalCreditOfferRepository)
     {
         $this->personRepository = $personRepository;
+        $this->personalCreditOfferRepository = $personalCreditOfferRepository;
     }
 
     public function persons(): \Illuminate\Support\Collection
@@ -68,5 +73,18 @@ class PersonaService implements PersonaServiceInterface
         }
 
         return true;
+    }
+
+    public function creditOfferConsult($idPerson = null): JsonResource
+    {
+        $personalCredit = PersonalCreditOfferFactory::make($idPerson);
+        $result = $personalCredit->consult();
+        return new JsonResource($result->all());
+    }
+
+    public function simulationOffer(int $idPerson, int $idInstitution, string $codModality): JsonResource
+    {
+        $simulation = GosatApiFactory::simulationOffer($idPerson, $idInstitution, $codModality);
+        return new JsonResource($simulation->consult()->all());
     }
 }

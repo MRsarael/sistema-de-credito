@@ -9,6 +9,6 @@ class LogApi extends Model
 {
     use HasFactory;
     protected $table = 'log_api';
-    protected $fillable = ['body', 'response', 'code', 'client'];
+    protected $fillable = ['body', 'response', 'code', 'client', 'method', 'url'];
     public $timestamps = true;
 }

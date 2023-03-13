@@ -10,7 +10,7 @@ class PersonalCreditOfferFactory
     public static function make($idPerson = null): CreditSystemInterface
     {
         $creditSystem = app(CreditSystem::class);
-        $creditSystem->setIdPerson($idPerson);
+        if($idPerson !== null) $creditSystem->setIdPerson($idPerson);
         return $creditSystem;
     }
 }

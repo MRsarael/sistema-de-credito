@@ -19,6 +19,8 @@ class CreateTableLogApi extends Migration
             $table->text('response');
             $table->string('code');
             $table->enum('client', ['GOSAT']);
+            $table->string('method');
+            $table->text('url');
             $table->timestamps();
         });
     }

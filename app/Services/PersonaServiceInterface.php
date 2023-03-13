@@ -11,4 +11,6 @@ interface PersonaServiceInterface
     public function updatePerson(array $data): JsonResource;
     public function showPerson(int $idPerson): JsonResource;
     public function deletePerson(int $idPerson): bool;
+    public function creditOfferConsult($idPerson = null): JsonResource;
+    public function simulationOffer(int $idPerson, int $idInstitution, string $codModality): JsonResource;
 }

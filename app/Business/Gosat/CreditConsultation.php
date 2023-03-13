@@ -55,16 +55,17 @@ class CreditConsultation extends GosatApi
     {
         DB::beginTransaction();
         
-        try {
-            $response = $this->client->request('POST', $this->baseUrlApi . '/simulacao/credito', ['form_params' => [
-                'cpf' => $this->objectConsult->getCpf()
-            ]]);
+        $method = 'POST';
+        $url = $this->baseUrlApi . '/simulacao/credito';
 
+        try {
+            $response = $this->client->request($method, $url, ['form_params' => ['cpf' => $this->objectConsult->getCpf()]]);
+            
             if($response->getStatusCode() == 200) {
                 $contentjson = $response->getBody()->getContents();
                 $contentObject = \json_decode($contentjson);
 
-                $this->log($this->objectConsult->toString(), $contentjson, '200', 'GOSAT');
+                $this->log($this->objectConsult->toString(), $contentjson, '200', 'GOSAT', $method, $url);
     
                 if(is_array($contentObject->instituicoes) && !empty($contentObject->instituicoes)) {
                     foreach ($contentObject->instituicoes as $institution) {
@@ -97,7 +98,7 @@ class CreditConsultation extends GosatApi
 
             $message = $e->getMessage();
             $code = $e->getCode();
-            $this->log($this->objectConsult->toString(), $message, $code, 'GOSAT');
+            $this->log($this->objectConsult->toString(), $message, $code, 'GOSAT', $method, $url);
             
             throw new \Exception($message, 500);
         }

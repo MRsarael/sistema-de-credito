@@ -16,13 +16,11 @@ class ObjectConsultOfferCredit implements ConsultOfferCreditInterface
 
     public static function make(\App\Http\Resources\PersonResource $person): self
     {
-        $self = new ObjectConsultOfferCredit;
-
+        $self = app(ObjectConsultOfferCredit::class);
         $self->setId($person['id']);
         $self->setName($person['name']);
         $self->setEmail($person['email']);
         $self->setCpf($person['cpf']);
-
         return $self;
     }
 
