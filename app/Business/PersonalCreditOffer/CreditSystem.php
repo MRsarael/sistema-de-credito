@@ -69,7 +69,10 @@ class CreditSystem implements CreditSystemInterface
                     INNER JOIN financial_institution AS fi  ON fi.id = com.id_financial_institution
                     LEFT JOIN simulation             AS s   ON s.id_personal_credit_offer = pco.id
                 WHERE
-                    1=1
+                    pco.deleted_at IS NULL
+                    AND com.deleted_at IS NULL
+                    AND fi.deleted_at IS NULL
+                    AND s.deleted_at IS NULL
         ";
 
         if($this->idPerson) {
