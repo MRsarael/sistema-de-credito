@@ -122,7 +122,7 @@ class CreditConsultation extends GosatApi
                 $idExistsList = $financialInstitutions->map(function($value) {
                     return $value['id_gosat'];
                 })->all();
-
+                
                 // Filtrando somente os registros que podem ser inseridos:
                 $financialInstitutionValidInsert = $this->financialInstitution->whereNotIn('id_gosat', $idExistsList)->all();
             }
@@ -135,7 +135,8 @@ class CreditConsultation extends GosatApi
     private function verifyCreditOfferModality(): void
     {
         if($this->creditOfferModality->count() > 0) {
-            $financialInstitution = $this->joinIdFinancialInstitution($this->creditOfferModality);
+            $creditOfferModality = $this->joinIdFinancialInstitution($this->creditOfferModality);
+            $financialInstitution = clone $creditOfferModality;
             
             foreach ($financialInstitution->all() as $key => $value) {
                 $creditOfferModalityCollect = $this->creditOfferModalityRepository->search([
@@ -157,13 +158,13 @@ class CreditConsultation extends GosatApi
 
             // Inserindo os resultados que sobraram
             $this->creditOfferModalityRepository->storeFromArray($financialInstitution->all());
-            $this->verifyPersonalCreditOffer($financialInstitution);
+            $this->verifyPersonalCreditOffer($creditOfferModality);
         }
     }
 
     private function verifyPersonalCreditOffer(Collection $financialInstitution): void
     {
-        // $personalCreditOffer = $this->personalCreditOfferRepository->creditOfferPerson($this->objectConsult->getId());
+        $personalCreditOffer = $this->personalCreditOfferRepository->creditOfferPerson($this->objectConsult->getId());
 
         $financialInstitutionList = $financialInstitution->map(function($value) {
             return [
@@ -184,7 +185,10 @@ class CreditConsultation extends GosatApi
             
             $idCreditOfferModality = (int) Crypt::decryptString($creditOfferModalityCollect->first()['id']);
             $idPerson = (int) $this->objectConsult->getId();
-            $this->personalCreditOfferRepository->new($idPerson, $idCreditOfferModality);
+
+            // Atrelando oferta à pessoa, somente se ainda não possuir
+            if($personalCreditOffer->where('id_credit_offer_modality', $idCreditOfferModality)->count() == 0)
+                $this->personalCreditOfferRepository->new($idPerson, $idCreditOfferModality);
         }
     }
 

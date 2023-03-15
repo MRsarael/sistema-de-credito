@@ -393,8 +393,9 @@ async function consultCreditOffer(idPerson)
 {
     return new Promise(async (resolve, reject) => {
         fetch(`${appUrl}/api/credit/${idPerson}`).then(async (response) => {
-            if(String(response.status) !== '200') throw new Error(response.statusText)
             const json = await response.json()
+
+            if(json.error) throw new Error(json.message)
             
             if(json.response.length) {
                 const response = json.response[0]
