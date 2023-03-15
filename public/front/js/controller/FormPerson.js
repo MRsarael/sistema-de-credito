@@ -16,6 +16,7 @@ class FormPerson {
     async resetForm()
     {
         this._form.reset()
+        this._form.className = ''
     }
 
     async save()
