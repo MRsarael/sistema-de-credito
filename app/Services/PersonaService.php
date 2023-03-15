@@ -85,6 +85,7 @@ class PersonaService implements PersonaServiceInterface
     public function simulationOffer(int $idPerson, int $idInstitution, string $codModality): JsonResource
     {
         $simulation = GosatApiFactory::simulationOffer($idPerson, $idInstitution, $codModality);
-        return new JsonResource($simulation->consult()->all());
+        $personalCredit = PersonalCreditOfferFactory::make($idPerson);
+        return new JsonResource($personalCredit->consult()->all());
     }
 }

@@ -1,30 +1,33 @@
 (async function () {
     'use strict'
 
-    const divFormPerson = document.getElementById('modalFormPerson')
+    const divModalFormPerson = document.getElementById('modalFormPerson')
     const divModalDatailPerson = document.getElementById('modalDatailPerson')
 
-    const modalFormPerson = new bootstrap.Modal(divFormPerson, {})
+    const modalFormPerson = new bootstrap.Modal(divModalFormPerson, {})
     const modalDatailPerson = new bootstrap.Modal(divModalDatailPerson, {})
+    
+    document.getElementById('btn-new-person').addEventListener('click', () => {
+        modalFormPerson.show()
+    })
+    
+    if(document.querySelector('.list-person')) {
+        await addEventsButtonTableList(modalFormPerson, modalDatailPerson, divModalDatailPerson)
+    }
 
-    let formPerson = new FormPerson(divFormPerson)
-
-    await addEventsButtonTableList(modalFormPerson, modalDatailPerson, divModalDatailPerson)
-    await addEventsButtonModal(divFormPerson, modalFormPerson, modalDatailPerson, divModalDatailPerson)
+    await addEventsButtonModal(divModalFormPerson, modalFormPerson, modalDatailPerson, divModalDatailPerson)
 })()
 
 async function addEventsButtonModal(divFormPerson, modalFormPerson, modalDatailPerson, divModalDatailPerson)
 {
     divFormPerson.querySelector('.close-modal').addEventListener('click', async () => {
         const divModal = document.getElementById('modalFormPerson')
-        await closeModalRegister(divModal.querySelector('#form-person'), divModal.querySelector('.close-modal'), divModal.querySelector('.save-modal'))
-        modalFormPerson.hide()
+        await closeModalRegister(divModal, modalFormPerson)
     })
 
     divFormPerson.querySelector('.save-modal').addEventListener('click', async () => {
         const divModal = document.getElementById('modalFormPerson')
-        await registerPerson(divModal.querySelector('#form-person'), divModal.querySelector('.close-modal'), divModal.querySelector('.save-modal'))
-        modalFormPerson.hide()
+        await registerPerson(divModal)
     })
 
     document.getElementById('modalDatailPerson').querySelector('.close-modal').addEventListener('click', async (element) => {
@@ -60,7 +63,12 @@ async function addEventsButtonTableList(modalFormPerson, modalDatailPerson, divM
         const id = element.dataset.identifier
 
         element.addEventListener('click', async () => {
+            openLoad()
+            const divModalFormPerson = document.getElementById('modalFormPerson')
+            const dataPerson = await getPerson(id)
+            await buildFormEditPerson(dataPerson, divModalFormPerson)
             await modalFormPerson.show()
+            closeLoad()
         })
     })
 
@@ -69,7 +77,14 @@ async function addEventsButtonTableList(modalFormPerson, modalDatailPerson, divM
 
         element.addEventListener('click', async () => {
             if(confirm("Tem certeza que deseja excluir esta pessoa?")) {
-                console.log('Excluindo!!')
+                openLoad()
+
+                deletePerson(id).then(response => {
+                    location.reload()
+                }).catch(error => {
+                    showMessage('error', error.message)
+                    closeLoad()
+                })
             }
         })
     })
@@ -90,26 +105,26 @@ async function buildPersonDetail(divModalDatailPerson, response)
             const idCreditOfferModality = creditOfferModality.id
             let htmlSimulationDetail = ''
 
-            if(creditOfferModality.simulation.length) {
+            if(creditOfferModality.simulation) {
                 htmlSimulationDetail += `
                     <tr>
                         <td colspan="5">
                             <table class="table table-bordered">
                                 <tbody>
                                     <tr>
-                                        <td>Quantidade máxima de parcelas</td><td>${creditOfferModality.simulation[0].max_installments}</td>
+                                        <td>Quantidade máxima de parcelas</td><td>${creditOfferModality.simulation.max_installments}</td>
                                     </tr>
                                     <tr>
-                                        <td>Quantidade mínima de parcelas</td><td>${creditOfferModality.simulation[0].min_installments}</td>
+                                        <td>Quantidade mínima de parcelas</td><td>${creditOfferModality.simulation.min_installments}</td>
                                     </tr>
                                     <tr>
-                                        <td>Valor máximo</td><td>${creditOfferModality.simulation[0].max_value}</td>
+                                        <td>Valor máximo</td><td>${creditOfferModality.simulation.max_value}</td>
                                     </tr>
                                     <tr>
-                                        <td>Valor mínimo</td><td>${creditOfferModality.simulation[0].min_value}</td>
+                                        <td>Valor mínimo</td><td>${creditOfferModality.simulation.min_value}</td>
                                     </tr>
                                     <tr>
-                                        <td>Juros mensal</td><td>${creditOfferModality.simulation[0].month_interest}</td>
+                                        <td>Juros mensal</td><td>${creditOfferModality.simulation.month_interest}</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -117,18 +132,18 @@ async function buildPersonDetail(divModalDatailPerson, response)
                     </tr>
                 `
             }
-
+            
             if(creditOfferModality.creditOfferModality.length) {
                 const idInstitution = creditOfferModality.creditOfferModality[0].idInstitution
                 const codCreditOfferModality = creditOfferModality.creditOfferModality[0].cod
 
                 htmlCreditOfferModality += `
                     <tr>
-                        <td scope="col">${creditOfferModality.creditOfferModality[0].description}</td>
-                        <td scope="col">${creditOfferModality.creditOfferModality[0].nameInstitution}</td>
-                        <td scope="col">${creditOfferModality.creditOfferModality[0].idGosat}</td>
-                        <td scope="col">${creditOfferModality.creditOfferModality[0].cod}</td>
-                        <td scope="col">
+                        <th scope="col">${creditOfferModality.creditOfferModality[0].description}</th>
+                        <th scope="col">${creditOfferModality.creditOfferModality[0].nameInstitution}</th>
+                        <th scope="col">${creditOfferModality.creditOfferModality[0].idGosat}</th>
+                        <th scope="col">${creditOfferModality.creditOfferModality[0].cod}</th>
+                        <th scope="col">
                             <button type="button" class="btn btn-outline-primary btn-sm btn-simulation-offer" data-bs-toggle="tooltip" data-bs-placement="top" title="Nova simulação"
                                 data-identifier-person="${idPerson}"
                                 data-cod-modality="${codCreditOfferModality}"
@@ -138,7 +153,7 @@ async function buildPersonDetail(divModalDatailPerson, response)
                                     <path d="M9.302 1.256a1.5 1.5 0 0 0-2.604 0l-1.704 2.98a.5.5 0 0 0 .869.497l1.703-2.981a.5.5 0 0 1 .868 0l2.54 4.444-1.256-.337a.5.5 0 1 0-.26.966l2.415.647a.5.5 0 0 0 .613-.353l.647-2.415a.5.5 0 1 0-.966-.259l-.333 1.242-2.532-4.431zM2.973 7.773l-1.255.337a.5.5 0 1 1-.26-.966l2.416-.647a.5.5 0 0 1 .612.353l.647 2.415a.5.5 0 0 1-.966.259l-.333-1.242-2.545 4.454a.5.5 0 0 0 .434.748H5a.5.5 0 0 1 0 1H1.723A1.5 1.5 0 0 1 .421 12.24l2.552-4.467zm10.89 1.463a.5.5 0 1 0-.868.496l1.716 3.004a.5.5 0 0 1-.434.748h-5.57l.647-.646a.5.5 0 1 0-.708-.707l-1.5 1.5a.498.498 0 0 0 0 .707l1.5 1.5a.5.5 0 1 0 .708-.707l-.647-.647h5.57a1.5 1.5 0 0 0 1.302-2.244l-1.716-3.004z"/>
                                 </svg>
                             </button>
-                        </td>
+                        </th>
                     </tr>
                     ${htmlSimulationDetail}
                 `
@@ -201,6 +216,15 @@ async function buildPersonDetail(divModalDatailPerson, response)
     divTitle.innerHTML = response.name
 }
 
+async function buildFormEditPerson(dataPerson, divModalForm)
+{
+    let person = new Person(dataPerson.name, formatCpf(dataPerson.cpf), dataPerson.email, dataPerson.age)
+    person.id = dataPerson.id
+    let formPerson = new FormPerson(divModalForm.querySelector('#form-person'))
+    formPerson.setPerson(person)
+    divModalForm.querySelector('.save-modal').dataset.identifier = dataPerson.id
+}
+
 async function buildToltipPersonDetail(divModalDatailPerson)
 {
     let divBody = divModalDatailPerson.querySelector('.modal-body')
@@ -221,8 +245,17 @@ async function buildEventspPersonDetail(divModalDatailPerson)
         btn.addEventListener('click', async (button) => {
             openLoad()
 
-            simulateCreditOffer(identifiers.identifierPerson, identifiers.codModality, identifiers.identifierInstitution).then(response => {
-                closeLoad()
+            simulateCreditOffer(identifiers.identifierPerson, identifiers.codModality, identifiers.identifierInstitution).then(async (response) => {
+                if(response.length) {
+                    await clearModalPersonDetail(divModalDatailPerson)
+                    await buildPersonDetail(divModalDatailPerson, response[0])
+                    await buildToltipPersonDetail(divModalDatailPerson)
+                    await buildEventspPersonDetail(divModalDatailPerson)
+                    closeLoad()
+                    return
+                }
+
+                throw new Error('Nenhum registro encontrado')
             }).catch(error => {
                 closeLoad()
                 showMessage('error', error.message)
@@ -231,7 +264,23 @@ async function buildEventspPersonDetail(divModalDatailPerson)
     })
 
     divBody.querySelectorAll('.btn-consult-offer').forEach(btn => {
-        console.log(btn.dataset.identifier)
+        const identifier = btn.dataset.identifier
+
+        btn.addEventListener('click', async (button) => {
+            openLoad()
+
+            consultCreditOffer(identifier).then(async (response) => {
+                clearModalPersonDetail(divModalDatailPerson)
+                await buildPersonDetail(divModalDatailPerson, response)
+                await buildToltipPersonDetail(divModalDatailPerson)
+                await buildEventspPersonDetail(divModalDatailPerson)
+
+                closeLoad()
+            }).catch(error => {
+                closeLoad()
+                showMessage('error', error.message)
+            })
+        })
     })
 }
 
@@ -241,23 +290,61 @@ async function clearModalPersonDetail(divModal)
     divModal.querySelector('.modal-body').innerHTML = ''
 }
 
-async function closeModalRegister(form, btnSave, btnEdit)
+async function closeModalRegister(divModalForm, modal)
 {
-    console.log(form, btnSave, btnEdit)
+    let form = divModalForm.querySelector('#form-person')
+    let btnClose = divModalForm.querySelector('.close-modal')
+    let btnSave = divModalForm.querySelector('.save-modal')
+
+    let formPerson = new FormPerson(form)
+    formPerson.resetForm()
+    btnSave.dataset.identifier = ''
+    modal.hide()
 }
 
-async function registerPerson(form, btnSave, btnEdit)
+async function registerPerson(divModalForm)
 {
-    console.log(form, btnSave, btnEdit)
+    let form = divModalForm.querySelector('#form-person')
+
+    if (!form.checkValidity()) {
+        form.classList.add('was-validated')
+        closeLoad()
+        return
+    }
+
+    openLoad()
+
+    let btnClose = divModalForm.querySelector('.close-modal')
+    let btnSave = divModalForm.querySelector('.save-modal')
+    let formPerson = new FormPerson(form)
+
+    let cpf = form.querySelector('#input-cpf').value.match(/\d+/g).join('')
+
+    let person = new Person(
+        form.querySelector('#input-name').value,
+        cpf,
+        form.querySelector('#input-email').value,
+        form.querySelector('#input-idade').value
+    )
+
+    person.id = btnSave.dataset.identifier ? btnSave.dataset.identifier : null
+    formPerson.setPerson(person)
+
+    formPerson.save().then(response => {
+        location.reload()
+    }).catch(error => {
+        showMessage('error', error.message)
+        closeLoad()
+    })
 }
 
-async function getPerson(id)
+async function getPerson(idPerson)
 {
     return new Promise(async (resolve, reject) => {
-        fetch(`${appUrl}/api/person/credit/offer/${id}`).then(async (response) => {
+        fetch(`${appUrl}/api/person/credit/offer/${idPerson}`).then(async (response) => {
             if(String(response.status) !== '200') throw new Error(response.statusText)
             const json = await response.json()
-            
+
             if(json.response.length) {
                 const response = json.response[0]
                 resolve(response)
@@ -290,7 +377,7 @@ async function simulateCreditOffer(idPerson, codModality, idInstitution)
             if(String(response.status) !== '200') throw new Error(response.statusText)
             const json = await response.json()
 
-            if(json.response.length) {
+            if(json.response) {
                 resolve(json.response)
                 return
             }
@@ -302,5 +389,45 @@ async function simulateCreditOffer(idPerson, codModality, idInstitution)
     })
 }
 
-// ${appUrl}/api/credit
+async function consultCreditOffer(idPerson)
+{
+    return new Promise(async (resolve, reject) => {
+        fetch(`${appUrl}/api/credit/${idPerson}`).then(async (response) => {
+            if(String(response.status) !== '200') throw new Error(response.statusText)
+            const json = await response.json()
+            
+            if(json.response.length) {
+                const response = json.response[0]
+                resolve(response)
+                return
+            }
+
+            throw new Error('Nenhum registro encontrado')
+        }).catch(error => {
+            reject({message: error.message})
+        })
+    })
+}
+
+async function deletePerson(idPerson)
+{
+    return new Promise(async (resolve, reject) => {
+        fetch(`${appUrl}/api/person/${idPerson}`, {
+            method: 'DELETE',
+            headers: {
+                accept: 'application.json',
+                'Content-Type': 'application/json'
+            }
+        }).then(async (response) => {
+            const json = await response.json()
+            
+            if(json.error) {
+                throw new Error(json.message)
+            }
+        }).catch(error => {
+            reject({message: error.message})
+        })
+    })
+}
+
 

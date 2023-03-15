@@ -1,22 +1,35 @@
 @extends('app')
 
 @section('content')
-    <div class="my-3 p-3 bg-body rounded shadow-sm">
+    {{-- <div class="my-3 p-3 bg-body rounded shadow-sm">
         <h6>
             <p id="description-form">Formulário de cadastro</p>
         </h6>
+    </div>
+    <hr/> --}}
+    <div class="my-3 p-3 bg-body rounded shadow-sm">
+        <div class="row">
+            <div class="col-md-6">
+                <h5><p id="description-list">Alunos cadastrados</p></h5>
+            </div>
+            <div class="col-md-6">
+                <p style="float:right;">
+                    <button type="button" class="btn btn-primary btn-sm" id="btn-new-person">
+                        Cadastrar pessoa
+                    </button>
+                </p>
+            </div>
+        </div>
 
         <hr/>
-
-        <div class="my-3 p-3 bg-body rounded shadow-sm">
-            <h6>
-                <p id="description-list">Alunos cadastrados</p>
-            </h6>
-
-            <hr/>
-            
-            <div class="row">
-                <div class="table-responsive">
+        
+        <div class="row">
+            @if ($data->isEmpty())
+                <div class="alert alert-primary" role="alert">
+                    Nenhum registro foi encontrado!
+                </div>
+            @else
+                <div class="table-responsive list-person">
                     <table class="table table-striped table-hover" id="table-list">
                         <thead>
                             <tr>
@@ -62,13 +75,13 @@
                         </tbody>
                     </table>
                 </div>
-            </div>
+            @endif
         </div>
     </div>
     
     @component('modal.modal_form_person')
         <button type="button" class="btn btn-secondary close-modal">Fechar</button>
-        <button type="button" class="btn btn-primary save-modal">Salvar</button>
+        <button type="button" class="btn btn-primary save-modal" data-identifier="">Salvar</button>
     @endcomponent
 
     @component('modal.modal_datail_person')

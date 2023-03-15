@@ -140,7 +140,7 @@ class CreditSystem implements CreditSystemInterface
                                 $simulationObject->max_value = $simulation->simulation_max_value;
                                 $simulationObject->month_interest = $simulation->simulation_month_interest;
                                 return $simulationObject;
-                            });
+                            })->first();
                         
                         $personObject->personalCreditOffer->push($creditOfferObject);
                     }

@@ -11,6 +11,14 @@ async function cpf(input) {
   input.value = text
 }
 
+function formatCpf(text) {
+  text = text.replace(/\D/g,"")
+  text = text.replace(/(\d{3})(\d)/,"$1.$2")
+  text = text.replace(/(\d{3})(\d)/,"$1.$2")
+  text = text.replace(/(\d{3})(\d{1,2})$/,"$1-$2")
+  return text
+}
+
 function showMessage(type, msg)
 {
   var myToastEl = document.getElementById('liveToast')
