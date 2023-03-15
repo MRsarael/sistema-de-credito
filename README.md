@@ -2,16 +2,16 @@
 
 ## Sobre o projeto
 
-Sistema de simulação de oferta de crédito consumindo a API de testes de #Gosat#.
+Sistema de simulação de oferta de crédito consumindo a API de testes de # Gosat #.
 
-Acessando a hora #home# é possível acessar o front da aplicação feito com javascript e Bootstrap 5.
+Acessando a hora # home # é possível acessar o front da aplicação feito com javascript e Bootstrap 5.
 
 <p align="center">
     <img src="https://lh3.googleusercontent.com/drive-viewer/AAOQEOR1vyzVZL8ssw5Tym0dGqxH5K7g2BbH0sUtnNT3S5gumCOT06Qt6dwERbzpIRk4axGmhRmYy9hFfQzTI1IdM94-jBV_xQ=w1920-h937" width="400">
 </p>
 
 <p>
-    ##CPF's de teste:<br/>
+    ## CPF's de teste:<br/>
     <br/>11111111111
     <br/>22222222222
     <br/>12312312312
