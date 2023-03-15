@@ -76,3 +76,7 @@ function closeLoad()
   }
 }
 
+function convertPercent(floatNumber)
+{
+  return String(parseFloat(String(floatNumber).replace(',', '.')) * 100).replace('.', ',') + '%'
+}

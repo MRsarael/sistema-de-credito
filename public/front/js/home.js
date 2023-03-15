@@ -8,6 +8,7 @@
     const modalDatailPerson = new bootstrap.Modal(divModalDatailPerson, {})
     
     document.getElementById('btn-new-person').addEventListener('click', () => {
+        divModalFormPerson.querySelector('#modalFormPersonLabel').innerHTML = 'Cadastrar'
         modalFormPerson.show()
     })
     
@@ -78,7 +79,7 @@ async function addEventsButtonTableList(modalFormPerson, modalDatailPerson, divM
         element.addEventListener('click', async () => {
             if(confirm("Tem certeza que deseja excluir esta pessoa?")) {
                 openLoad()
-
+                
                 deletePerson(id).then(response => {
                     location.reload()
                 }).catch(error => {
@@ -124,7 +125,7 @@ async function buildPersonDetail(divModalDatailPerson, response)
                                         <td>Valor mínimo</td><td>${creditOfferModality.simulation.min_value}</td>
                                     </tr>
                                     <tr>
-                                        <td>Juros mensal</td><td>${creditOfferModality.simulation.month_interest}</td>
+                                        <td>Juros mensal</td><td>${convertPercent(creditOfferModality.simulation.month_interest)}</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -223,6 +224,7 @@ async function buildFormEditPerson(dataPerson, divModalForm)
     let formPerson = new FormPerson(divModalForm.querySelector('#form-person'))
     formPerson.setPerson(person)
     divModalForm.querySelector('.save-modal').dataset.identifier = dataPerson.id
+    divModalForm.querySelector('#modalFormPersonLabel').innerHTML = 'Editar'
 }
 
 async function buildToltipPersonDetail(divModalDatailPerson)
@@ -295,10 +297,13 @@ async function closeModalRegister(divModalForm, modal)
     let form = divModalForm.querySelector('#form-person')
     let btnClose = divModalForm.querySelector('.close-modal')
     let btnSave = divModalForm.querySelector('.save-modal')
+    let titleModal = divModalForm.querySelector('#modalFormPersonLabel')
 
     let formPerson = new FormPerson(form)
     formPerson.resetForm()
     btnSave.dataset.identifier = ''
+    titleModal.innerHTML = ''
+
     modal.hide()
 }
 
@@ -425,6 +430,8 @@ async function deletePerson(idPerson)
             if(json.error) {
                 throw new Error(json.message)
             }
+
+            resolve({response: {}, message: 'success'})
         }).catch(error => {
             reject({message: error.message})
         })
