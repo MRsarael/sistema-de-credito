@@ -65,8 +65,8 @@ class CreditSystem implements CreditSystemInterface
                 FROM
                     person p
                     LEFT JOIN personal_credit_offer  AS pco ON pco.id_person = p.id
-                    INNER JOIN credit_offer_modality AS com ON com.id = pco.id_credit_offer_modality
-                    INNER JOIN financial_institution AS fi  ON fi.id = com.id_financial_institution
+                    LEFT JOIN credit_offer_modality AS com ON com.id = pco.id_credit_offer_modality
+                    LEFT JOIN financial_institution AS fi  ON fi.id = com.id_financial_institution
                     LEFT JOIN simulation             AS s   ON s.id_personal_credit_offer = pco.id
                 WHERE
                     pco.deleted_at IS NULL
@@ -97,49 +97,56 @@ class CreditSystem implements CreditSystemInterface
 
                 // Montando dados do person
                 $personObject = $this->buildPerson($dataCollection->first());
+                $personObject->personalCreditOffer = collect([]);
 
-                $personalCreditOffer = $dataCollection->map(function($offer) use ($dataCollection) {
-                    $creditOfferObject = new stdClass();
-                    $creditOfferObject->id = Crypt::encryptString($offer->personal_credit_offer_id);
-                    $creditOfferObject->creditOfferModality = collect([]);
-
-                    // Filtrando as modalidades de crédito para a oferta:
-                    $creditOfferModalityCollection = $dataCollection->where('credit_offer_modality_id', $offer->personal_credit_offer_id_credit_offer_modality)->all();
-                    
-                    foreach ($creditOfferModalityCollection as $key => $value) {
-                        $creditOfferModalityObject = new stdClass();
-                        $creditOfferModalityObject->id = Crypt::encryptString($value->credit_offer_modality_id);
-                        $creditOfferModalityObject->description = $value->credit_offer_modality_description;
-                        $creditOfferModalityObject->cod = $value->credit_offer_modality_cod;
-
-                        // Filtrando dados da instituição bancária
-                        $financialInstitution = $dataCollection->where('financial_institution_id', $value->credit_offer_modality_id_financial_institution)->first();
-
-                        if($financialInstitution !== null) {
-                            $creditOfferModalityObject->idInstitution = Crypt::encryptString($financialInstitution->financial_institution_id);
-                            $creditOfferModalityObject->idGosat = $financialInstitution->financial_institution_id_gosat;
-                            $creditOfferModalityObject->nameInstitution = $financialInstitution->financial_institution_name;
+                if($dataCollection->isNotEmpty()) {
+                    foreach ($dataCollection->all() as $key => $offer) {
+                        if($offer->personal_credit_offer_id == null) {
+                            continue;
                         }
 
-                        $creditOfferObject->creditOfferModality->push($creditOfferModalityObject);
+                        $creditOfferObject = new stdClass();
+                        $creditOfferObject->id = Crypt::encryptString($offer->personal_credit_offer_id);
+                        $creditOfferObject->creditOfferModality = collect([]);
+
+                        // Filtrando as modalidades de crédito para a oferta:
+                        $creditOfferModalityCollection = $dataCollection->where('credit_offer_modality_id', $offer->personal_credit_offer_id_credit_offer_modality)->all();
+                        
+                        foreach ($creditOfferModalityCollection as $key => $value) {
+                            $creditOfferModalityObject = new stdClass();
+                            $creditOfferModalityObject->id = Crypt::encryptString($value->credit_offer_modality_id);
+                            $creditOfferModalityObject->description = $value->credit_offer_modality_description;
+                            $creditOfferModalityObject->cod = $value->credit_offer_modality_cod;
+
+                            // Filtrando dados da instituição bancária
+                            $financialInstitution = $dataCollection->where('financial_institution_id', $value->credit_offer_modality_id_financial_institution)->first();
+
+                            if($financialInstitution !== null) {
+                                $creditOfferModalityObject->idInstitution = Crypt::encryptString($financialInstitution->financial_institution_id);
+                                $creditOfferModalityObject->idGosat = $financialInstitution->financial_institution_id_gosat;
+                                $creditOfferModalityObject->nameInstitution = $financialInstitution->financial_institution_name;
+                            }
+
+                            $creditOfferObject->creditOfferModality->push($creditOfferModalityObject);
+                        }
+
+                        // Filtrando as simulações realizadas para a oferta de crédito
+                        $creditOfferObject->simulation = $dataCollection->where('simulation_id_personal_credit_offer', $offer->personal_credit_offer_id)
+                            ->map(function($simulation) {
+                                $simulationObject = new stdClass();
+                                $simulationObject->min_installments = $simulation->simulation_min_installments;
+                                $simulationObject->max_installments = $simulation->simulation_max_installments;
+                                $simulationObject->min_value = $simulation->simulation_min_value;
+                                $simulationObject->max_value = $simulation->simulation_max_value;
+                                $simulationObject->month_interest = $simulation->simulation_month_interest;
+                                return $simulationObject;
+                            });
+                        
+                        $personObject->personalCreditOffer->push($creditOfferObject);
                     }
+                }
 
-                    // Filtrando as simulações realizadas para a oferta de crédito
-                    $creditOfferObject->simulation = $dataCollection->where('simulation_id_personal_credit_offer', $offer->personal_credit_offer_id)
-                        ->map(function($simulation) {
-                            $simulationObject = new stdClass();
-                            $simulationObject->min_installments = $simulation->simulation_min_installments;
-                            $simulationObject->max_installments = $simulation->simulation_max_installments;
-                            $simulationObject->min_value = $simulation->simulation_min_value;
-                            $simulationObject->max_value = $simulation->simulation_max_value;
-                            $simulationObject->month_interest = $simulation->simulation_month_interest;
-                            return $simulationObject;
-                        });
-                    
-                    return $creditOfferObject;
-                });
-
-                $personObject->personalCreditOffer = $personalCreditOffer;
+                // $personalCreditOffer = $dataCollection->map(function($offer) use ($dataCollection) {});
                 $result[] = $personObject;
             }
         }

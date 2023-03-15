@@ -62,7 +62,7 @@ class Simulation extends GosatApi
             $code = $e->getCode();
             $this->log($this->objectConsult->toString(), $message, $code, 'GOSAT', $method, $url);
             
-            throw new \Exception($message, 500);
+            throw new \Exception($message, $code);
         }
     }
 

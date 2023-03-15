@@ -2,6 +2,6 @@
 
 use Illuminate\Support\Facades\Route;
 
-Route::prefix('/')->group(function () {
-    Route::get('/', 'GosatCotroller@index');
-});
+Route::redirect('/', '/home', 301);
+Route::get('/home', \App\Http\Controllers\PersonalCreditSystemController::class . '@index')->name('home');
+
