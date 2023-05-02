@@ -7,7 +7,7 @@ Sistema de simulação de oferta de crédito consumindo a API de testes de *Gosa
 Acessando a hora *home* é possível acessar o front da aplicação feito com javascript e Bootstrap 5.
 
 <p align="center">
-    <img src="https://drive.google.com/file/d/1Q_1hwO9dF3Pl9QoIgc4mjuRF2T9i9fFF" width="400">
+    <img src="https://raw.githubusercontent.com/MRsarael/sistema-de-credito/main/public/images/tela1.png" width="400">
 </p>
 
 ## CPF's disponíveis para teste:<br/>
