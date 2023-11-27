@@ -42,7 +42,3 @@ php artisan migrate
 |`/api/person/credit/simulation`   | `POST`    | Realiza a simulação de uma oferta de crédito disponível por pessoa |
 |`/api/credit/{id}`                | `POST`    | Consulta na Gost as ofertas de crédito para o CPF                  |
 
-
-## Link collection Postman
-
-<p>https://elements.getpostman.com/redirect?entityId=10644227-6ed04899-4be0-47ec-8cd0-ee8bbbfc26b5&entityType=collection</p>
